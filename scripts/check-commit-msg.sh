@@ -7,6 +7,7 @@
 # It also supports the following types:
 # 1. ADD, CI, FEATURE, BUGFIX, FIX, INIT, DOCS, TEST, REFACTOR, STYLE, CHORE
 # 2. feat, fix, docs, style, refactor, test, chore, ci, build, perf, revert, add, feature, bugfix, init
+# 3. feat(scope): description
 
 COMMIT_MSG_FILE="$1"
 COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
