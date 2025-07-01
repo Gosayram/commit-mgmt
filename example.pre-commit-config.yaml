@@ -1,0 +1,69 @@
+# Example .pre-commit-config.yaml file
+# Copy this to your project root and rename to .pre-commit-config.yaml
+
+repos:
+  # Commit message validation from centralized repository
+  - repo: https://github.com/Gosayram/commit-mgmt
+    rev: main  # Use specific version tag in production (e.g., v1.0.0)
+    hooks:
+      - id: commit-msg-format
+
+  # Standard pre-commit hooks (optional but recommended)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-xml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+
+  # Language-specific hooks (uncomment as needed)
+
+  # Python
+  # - repo: https://github.com/psf/black
+  #   rev: 23.3.0
+  #   hooks:
+  #     - id: black
+  #       language_version: python3
+
+  # - repo: https://github.com/pycqa/isort
+  #   rev: 5.12.0
+  #   hooks:
+  #     - id: isort
+  #       args: [--profile=black]
+
+  # JavaScript/TypeScript
+  # - repo: https://github.com/pre-commit/mirrors-prettier
+  #   rev: v3.0.0
+  #   hooks:
+  #     - id: prettier
+  #       types_or: [javascript, jsx, ts, tsx, json, yaml, markdown]
+
+  # Go
+  # - repo: https://github.com/tekwizely/pre-commit-golang
+  #   rev: v1.0.0-beta.5
+  #   hooks:
+  #     - id: go-fmt
+  #     - id: go-imports
+  #     - id: go-vet-mod
+  #     - id: go-test-mod
+
+# Configuration
+ci:
+  autofix_commit_msg: |
+    [STYLE] - auto-fix pre-commit hooks
+
+    Co-authored-by: pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+  autoupdate_commit_msg: |
+    [CI] - auto-update pre-commit hooks
+
+    Co-authored-by: pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com> 

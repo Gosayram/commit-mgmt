@@ -1,0 +1,45 @@
+version: 2
+updates:
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "[CI]"
+      prefix-development: "[CI]"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "ci"
+      - "security"
+    reviewers:
+      - "Gosayram"
+    assignees:
+      - "Gosayram"
+    # Allow automatic merging for security updates
+    allow:
+      - dependency-type: "all"
+    # Group updates to reduce PR noise
+    groups:
+      github-actions-security:
+        patterns:
+          - "*"
+        update-types:
+          - "security-update"
+      github-actions-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+      github-actions-minor:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+    # Enable automatic rebasing of PRs when base branch is updated
+    rebase-strategy: "auto"
+    # Pull request branch naming strategy
+    pull-request-branch-name:
+      separator: "/" 

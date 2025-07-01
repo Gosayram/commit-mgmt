@@ -1,0 +1,8 @@
+---
+- id: commit-msg-format
+  name: Commit Message Format Validation
+  description: Validate commit message format (supports both custom [TYPE] - description and conventional commit formats)
+  entry: scripts/check-commit-msg.sh
+  language: script
+  stages: [commit-msg]
+  pass_filenames: true 
