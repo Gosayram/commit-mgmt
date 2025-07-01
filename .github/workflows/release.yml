@@ -92,7 +92,7 @@ jobs:
 
       - name: Create Release
         if: steps.check-version.outputs.should_release == 'true'
-        uses: softprops/action-gh-release@a4b23b3c4d0dea74b51b74ad3adb0b0e2bb5c17f # v2.3.2
+        uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
         with:
           tag_name: ${{ steps.calc-version.outputs.new_version }}
           name: Release ${{ steps.calc-version.outputs.new_version }}

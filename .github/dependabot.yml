@@ -23,11 +23,6 @@ updates:
       - dependency-type: "all"
     # Group updates to reduce PR noise
     groups:
-      github-actions-security:
-        patterns:
-          - "*"
-        update-types:
-          - "security-update"
       github-actions-patch:
         patterns:
           - "*"
@@ -38,6 +33,11 @@ updates:
           - "*"
         update-types:
           - "minor"
+      github-actions-major:
+        patterns:
+          - "*"
+        update-types:
+          - "major"
     # Enable automatic rebasing of PRs when base branch is updated
     rebase-strategy: "auto"
     # Pull request branch naming strategy
