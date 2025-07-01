@@ -1,9 +1,12 @@
 #!/bin/bash
 
-# Script to validate commit message format
-# Supports two formats:
+# This script is used to validate the format of the commit message.
+# It supports two formats:
 # 1. [TYPE] - description (custom format)
 # 2. type: description (conventional commits format)
+# It also supports the following types:
+# 1. ADD, CI, FEATURE, BUGFIX, FIX, INIT, DOCS, TEST, REFACTOR, STYLE, CHORE
+# 2. feat, fix, docs, style, refactor, test, chore, ci, build, perf, revert, add, feature, bugfix, init
 
 COMMIT_MSG_FILE="$1"
 COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
