@@ -13,10 +13,10 @@ COMMIT_MSG_FILE="$1"
 COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
 
 # Define allowed types for custom format [TYPE] - description
-CUSTOM_TYPES="ADD|CI|FEATURE|BUGFIX|FIX|INIT|DOCS|TEST|REFACTOR|STYLE|CHORE"
+CUSTOM_TYPES="ADD|CI|FEATURE|BUGFIX|FIX|INIT|DOCS|TEST|REFACTOR|STYLE|CHORE|UPD"
 
 # Define allowed types for conventional format type: description
-CONVENTIONAL_TYPES="feat|fix|docs|style|refactor|test|chore|ci|build|perf|revert|add|feature|bugfix|init"
+CONVENTIONAL_TYPES="feat|fix|docs|style|refactor|test|chore|ci|build|perf|revert|add|feature|bugfix|init|upd"
 
 # Check if commit message follows either pattern
 if echo "$COMMIT_MSG" | grep -qE "^\[($CUSTOM_TYPES)\] - .+"; then
