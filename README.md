@@ -113,7 +113,7 @@ For production environments, it's recommended to pin to specific versions:
 ```yaml
 repos:
   - repo: https://github.com/Gosayram/commit-mgmt
-    rev: v1.0.0  # Use specific version tag
+    rev: v1.0.2  # Use specific version tag
     hooks:
       - id: commit-msg-format
 ```
