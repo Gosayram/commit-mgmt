@@ -35,39 +35,49 @@ jobs:
         run: |
           LATEST_TAG="${{ steps.get-latest-tag.outputs.latest_tag }}"
           
-          # Remove 'v' prefix and split version parts
-          VERSION_NUMBER=${LATEST_TAG#v}
-          IFS='.' read -r -a VERSION_PARTS <<< "$VERSION_NUMBER"
-          
-          MAJOR=${VERSION_PARTS[0]:-0}
-          MINOR=${VERSION_PARTS[1]:-0}
-          PATCH=${VERSION_PARTS[2]:-0}
-          
-          # Check commit messages to determine version bump
-          COMMIT_MESSAGES=$(git log $LATEST_TAG..HEAD --oneline)
-          
-          # Determine version bump based on commit messages
-          if echo "$COMMIT_MESSAGES" | grep -qE '^\w+\(.*\)!:|BREAKING CHANGE|^\[.*\].*!'; then
-            # Major version bump for breaking changes
-            MAJOR=$((MAJOR + 1))
-            MINOR=0
-            PATCH=0
-            BUMP_TYPE="major"
-          elif echo "$COMMIT_MESSAGES" | grep -qE '^(feat|feature|\[ADD\]|\[FEATURE\])'; then
-            # Minor version bump for new features
-            MINOR=$((MINOR + 1))
-            PATCH=0
-            BUMP_TYPE="minor"
+          # Check if this is the first release (no real tags exist)
+          if [ "$LATEST_TAG" = "v0.0.0" ]; then
+            # First release - start with v1.0.0
+            NEW_VERSION="v1.0.0"
+            BUMP_TYPE="initial"
+            echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+            echo "First release: $NEW_VERSION"
           else
-            # Patch version bump for fixes, docs, etc.
-            PATCH=$((PATCH + 1))
-            BUMP_TYPE="patch"
+            # Remove 'v' prefix and split version parts
+            VERSION_NUMBER=${LATEST_TAG#v}
+            IFS='.' read -r -a VERSION_PARTS <<< "$VERSION_NUMBER"
+            
+            MAJOR=${VERSION_PARTS[0]:-0}
+            MINOR=${VERSION_PARTS[1]:-0}
+            PATCH=${VERSION_PARTS[2]:-0}
+            
+            # Check commit messages to determine version bump
+            COMMIT_MESSAGES=$(git log $LATEST_TAG..HEAD --oneline)
+            
+            # Determine version bump based on commit messages
+            if echo "$COMMIT_MESSAGES" | grep -qE '^\w+\(.*\)!:|BREAKING CHANGE|^\[.*\].*!'; then
+              # Major version bump for breaking changes
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              BUMP_TYPE="major"
+            elif echo "$COMMIT_MESSAGES" | grep -qE '^(feat|feature|\[ADD\]|\[FEATURE\])'; then
+              # Minor version bump for new features
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              BUMP_TYPE="minor"
+            else
+              # Patch version bump for fixes, docs, etc.
+              PATCH=$((PATCH + 1))
+              BUMP_TYPE="patch"
+            fi
+            
+            NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
+            echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+            echo "Next version: $NEW_VERSION (bump type: $BUMP_TYPE)"
           fi
-          
-          NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
-          echo "Next version: $NEW_VERSION (bump type: $BUMP_TYPE)"
 
       - name: Check if version already exists
         id: check-version
@@ -84,8 +94,17 @@ jobs:
         id: get-commits
         if: steps.check-version.outputs.should_release == 'true'
         run: |
-          # Get last 5 commits for release notes
-          COMMITS=$(git log --oneline -5 --pretty=format:"- %s (%h)")
+          LATEST_TAG="${{ steps.get-latest-tag.outputs.latest_tag }}"
+          
+          # Get commits for release notes
+          if [ "$LATEST_TAG" = "v0.0.0" ]; then
+            # First release - get all commits
+            COMMITS=$(git log --oneline -10 --pretty=format:"- %s (%h)" 2>/dev/null || echo "- Initial commit")
+          else
+            # Regular release - get commits since last tag
+            COMMITS=$(git log $LATEST_TAG..HEAD --oneline --pretty=format:"- %s (%h)" 2>/dev/null || echo "- No new commits")
+          fi
+          
           echo "recent_commits<<EOF" >> $GITHUB_OUTPUT
           echo "$COMMITS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -99,9 +118,9 @@ jobs:
           body: |
             ## Release ${{ steps.calc-version.outputs.new_version }}
             
-            **Release type:** ${{ steps.calc-version.outputs.bump_type }} version bump
+            **Release type:** ${{ steps.calc-version.outputs.bump_type == 'initial' && 'Initial release' || format('{0} version bump', steps.calc-version.outputs.bump_type) }}
             
-            ### Recent Changes:
+            ### ${{ steps.calc-version.outputs.bump_type == 'initial' && 'Initial Features' || 'Recent Changes' }}:
             ${{ steps.get-commits.outputs.recent_commits }}
             
             ### Installation
@@ -130,7 +149,7 @@ jobs:
             
             ---
             
-            **Full Changelog**: https://github.com/Gosayram/commit-mgmt/compare/${{ steps.get-latest-tag.outputs.latest_tag }}...${{ steps.calc-version.outputs.new_version }}
+            ${{ steps.calc-version.outputs.bump_type == 'initial' && '**This is the first release of this project!**' || format('**Full Changelog**: https://github.com/Gosayram/commit-mgmt/compare/{0}...{1}', steps.get-latest-tag.outputs.latest_tag, steps.calc-version.outputs.new_version) }}
           draft: false
           prerelease: false
           generate_release_notes: false
